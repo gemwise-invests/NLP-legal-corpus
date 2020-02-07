@@ -15,13 +15,20 @@ from sklearn.linear_model import SGDClassifier
 sys.stdout = io.TextIOWrapper(
     sys.stdout.buffer, encoding='gb18030')  # 改变标准输出的默认编码
 
+import os
+os.chdir('C:/Users/xsong/law_learning/code') 
 # 重点是rb和r的区别，rb是打开2进制文件，文本文件用r
-f = open('Lawlist.pkl', 'rb')
-lawlist = pickle.load(f)
+f = open("../data/Lawlist.pkl", 'rb')
+lawlist = pickle.load(f) 
+#type(lawlist) # 列表
 # print(lawlist)
 lawarticle = []
 for list_num in range(len(lawlist)):
     lawarticle.append(lawlist[list_num][4])
+
+type(lawarticle)
+
+
 # print(lawarticle)
 '''
 file = open('E:/文档/团队/任务/项目/原始文本的分类/关键词json/332732.json', "rb")
@@ -72,7 +79,7 @@ for i in law:
 # print(len(total_law))
 
 # 导入训练集
-workbook = xlrd.open_workbook("E:\文档\团队\任务\项目\原始文本的分类\标注数据集.xlsx")
+workbook = xlrd.open_workbook("../data/train.xlsx")
 sheet1_object = workbook.sheet_by_name('Sheet1')
 train_datalist = sheet1_object.col_values(0)
 train_labelist = sheet1_object.col_values(1)
