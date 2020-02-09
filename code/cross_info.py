@@ -12,8 +12,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 import jieba
 from sklearn.linear_model import SGDClassifier
 
-sys.stdout = io.TextIOWrapper(
-    sys.stdout.buffer, encoding='gb18030')  # 改变标准输出的默认编码
+#sys.stdout = io.TextIOWrapper(
+#    sys.stdout.buffer, encoding='gb18030')  # 改变标准输出的默认编码
 
 import os
 os.chdir('C:/Users/xsong/law_learning/code') 
@@ -39,6 +39,10 @@ lawpiece = []
 for i in range(len(lawarticle)):
     lawpiece.append(lawarticle[i].split('\n\u3000\u3000'))  # 分开每一条
 # print(lawpiece)
+
+lawpiece = pd.DataFrame(lawpiece)
+lawpiece.head()
+
 
 for i in range(len(lawpiece)):
     for m in range(len(lawpiece[i])):
