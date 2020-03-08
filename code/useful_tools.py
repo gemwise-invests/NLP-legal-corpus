@@ -12,12 +12,32 @@ from sklearn.model_selection import cross_val_score
 
 stopword_list = [k.strip() for k in open('../data/stopword.txt', encoding='utf8').readlines() if k.strip() != '']
 # 加入新的停用词
-stop_word_new = ['一','二','三','四','五','六','七','八','九','十','不','未','互联网','网络','服务']
+stop_word_new = ['一','二','三','四','五','六','七','八','九','十','不','未']
 stopword_list.extend(stop_word_new)
+stopword_list.remove('是')
+stopword_list.remove('为了')
 jieba.add_word('区块链')
 jieba.add_word('微博客')
 jieba.add_word('根服务器')
-jieba.del_word('监督管理')
+jieba.add_word('所称')
+jieba.add_word('是指')
+jieba.add_word('为了')
+jieba.suggest_freq('为了', True)
+jieba.suggest_freq('本规定所称', True)
+jieba.suggest_freq('是指', True)
+jieba.add_word('提供者应当')
+jieba.add_word('鼓励')
+jieba.add_word('应当遵守')
+jieba.add_word('适用')
+#jieba.add_word('监督管理')
+#jieba.add_word('微博客')
+#jieba.add_word('关键信息')
+#jieba.add_word('区块链信息')
+#jieba.add_word('管理办法')
+#jieba.del_word('监督管理')
+#jieba.add_word('主管部门')
+
+
 
 def get_vectorize(wordlist,vector = 'CountVectorizer',feats =150):
     '''
@@ -41,8 +61,6 @@ def get_vectorize(wordlist,vector = 'CountVectorizer',feats =150):
         word_matrix = pd.DataFrame(cv_fit)
         return word_matrix
         
-    
-
 def get_cutword(string):
     '''
     jieba分词,正则替换数字
@@ -118,8 +136,48 @@ def plot_confusion_matrix(cm, classes,
     
 def cross_print_info(model,x,y,cv): # 模型, x, y, 交叉验证数
     '''
-    交叉验证分数打印
+    分数打印，可选交叉验证法或Bootstrap方法
     '''
-    cvscore = cross_val_score(model, x, y, cv=cv)
-    print(cv,'折交叉验证准确率为',round(cvscore.mean(),3))
+    cvscore = cross_val_score(model, x, y, cv = cv)
+    if isinstance(cv,int):
+        print(cv,'折交叉验证准确率为',round(cvscore.mean(),3))
+    else:
+        print('Bootstrap抽样准确率为',round(cvscore.mean(),3))
     
+def match_single(x, word):
+    '''
+    输入分词后的语料库和想匹配的单词，返回包含这个单词的对象
+    '''
+    if word in x:
+        x = word
+    else:
+        x = ''
+    return x
+
+def add_single_col(og_matrix ,ogcolumn, new_word):
+    '''
+    增加新词列,返回增加后的DTM. 报错因为所有行都不包含这个词
+    ''' 
+    cutWords = ogcolumn.apply(lambda x: get_cutword(x))
+    if new_word in og_matrix.columns:
+        return og_matrix
+    else:
+        newwdvec = cutWords.apply(lambda x: match_single(x, new_word)) # 得到新的想加入的列
+        new_max = get_vectorize(newwdvec) # 得到单独一列DTM
+        new_dtm = pd.concat([og_matrix, new_max], axis = 1, join='inner')
+        return new_dtm
+    
+def consist_train_test(train, test):
+    '''
+    使得测试集列名顺序与训练集一致
+    '''
+    new_df = pd.DataFrame()
+    for i in train.columns:
+        if i in test.columns:
+            new_df[i] = test[i]
+        else:
+            new_df[i] = 0
+    new_df.fillna(0, inplace = True)
+    order = train.columns
+    new_df[order]
+    return new_df
