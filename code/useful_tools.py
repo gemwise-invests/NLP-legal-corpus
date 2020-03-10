@@ -8,6 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import HashingVectorizer
 import itertools
+import pickle 
 from sklearn.model_selection import cross_val_score
 
 stopword_list = [k.strip() for k in open('../data/stopword.txt', encoding='utf8').readlines() if k.strip() != '']
@@ -156,28 +157,44 @@ def match_single(x, word):
 
 def add_single_col(og_matrix ,ogcolumn, new_word):
     '''
-    增加新词列,返回增加后的DTM. 报错因为所有行都不包含这个词
+    增加新词列,返回增加后的DTM. 所有行都不包含这个词时返回原矩阵
     ''' 
     cutWords = ogcolumn.apply(lambda x: get_cutword(x))
     if new_word in og_matrix.columns:
         return og_matrix
     else:
-        newwdvec = cutWords.apply(lambda x: match_single(x, new_word)) # 得到新的想加入的列
-        new_max = get_vectorize(newwdvec) # 得到单独一列DTM
-        new_dtm = pd.concat([og_matrix, new_max], axis = 1, join='inner')
-        return new_dtm
-    
-def consist_train_test(train, test):
+        try:
+            newwdvec = cutWords.apply(lambda x: match_single(x, new_word)) #得到想加入的列
+            new_max = get_vectorize(newwdvec) # 得到单独一列DTM
+            new_dtm = pd.concat([og_matrix, new_max], axis = 1, join='inner') 
+            return new_dtm
+        except ValueError:
+            print('抱歉，无法搜索到这个词')
+            return og_matrix
+        
+
+pkl_file = open('../classifier/colname.pkl','rb')    ## 以二进制方式打开文件
+train_col = pickle.load(pkl_file) 
+def consist_train_test(test):
     '''
     使得测试集列名顺序与训练集一致
     '''
     new_df = pd.DataFrame()
-    for i in train.columns:
+    for i in train_col:
         if i in test.columns:
             new_df[i] = test[i]
         else:
             new_df[i] = 0
     new_df.fillna(0, inplace = True)
-    order = train.columns
+    order = train_col
     new_df[order]
     return new_df
+
+def add_words(mat, ogcolumn):
+    '''
+    用于预测新数据，集成了最终模型需要加入的四个词
+    '''
+    cidian = ['所称', '是指', '为了', '鼓励', '应当遵守']
+    for i in cidian:
+        mat = add_single_col(mat , ogcolumn, i)
+    return mat
