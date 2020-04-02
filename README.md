@@ -1,2 +1,4 @@
-# law_learning
-a NLP machine learning for law text
+# Purpose
+A NLP machine learning for legal documents, based on public domain work contributed by [宋骁](https://github.com/songxxiao).
+
+# How to use
