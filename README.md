@@ -4,7 +4,7 @@
 
 [项目主页](https://programfun.netlify.com/laws/)  
 
-[最终程序](https://github.com/songxxiao/law_learning/releases/tag/)
+[最终程序](https://github.com/songxxiao/law_learning/releases)
 
 
 
