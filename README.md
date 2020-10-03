@@ -2,7 +2,7 @@
 # law_learning
 
 
-![](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-brightgreen.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 作者：[宋骁](https://xsong.ltd/)  
